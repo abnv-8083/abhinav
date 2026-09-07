@@ -1,0 +1,508 @@
+@import "tailwindcss";
+
+/* =========================================
+   DESIGN TOKENS & THEME
+   ========================================= */
+@theme {
+  --color-bg: #080808;
+  --color-bg-2: #0e0e0e;
+  --color-surface: #111111;
+  --color-surface-2: #161616;
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-text: #eeebe4;
+  --color-text-muted: #666666;
+  --color-text-dim: #444444;
+  --color-accent: #c8ff00;
+  --color-accent-dim: rgba(200, 255, 0, 0.12);
+  --color-accent-glow: rgba(200, 255, 0, 0.25);
+  --color-white: #ffffff;
+  --color-glass: rgba(255, 255, 255, 0.03);
+
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-glow: 0 0 40px rgba(200, 255, 0, 0.15);
+  --shadow-glow-sm: 0 0 20px rgba(200, 255, 0, 0.1);
+}
+
+/* =========================================
+   GLOBAL RESET & BASE
+   ========================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles this */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #080808;
+  color: #eeebe4;
+  font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
+  overflow-x: hidden;
+  cursor: none; /* Hide default cursor on desktop */
+}
+
+@media (max-width: 768px) {
+  body {
+    cursor: auto;
+  }
+}
+
+/* =========================================
+   SCROLLBAR
+   ========================================= */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+/* =========================================
+   TYPOGRAPHY
+   ========================================= */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+}
+
+/* =========================================
+   NOISE / GRAIN TEXTURE
+   ========================================= */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* =========================================
+   SELECTION
+   ========================================= */
+::selection {
+  background: rgba(200, 255, 0, 0.25);
+  color: #eeebe4;
+}
+
+/* =========================================
+   FOCUS STATES (Accessibility)
+   ========================================= */
+:focus-visible {
+  outline: 2px solid #c8ff00;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* =========================================
+   UTILITY CLASSES
+   ========================================= */
+.container-custom {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 5vw, 6rem);
+}
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #666666;
+}
+
+.accent-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c8ff00;
+  box-shadow: 0 0 8px rgba(200, 255, 0, 0.6);
+}
+
+/* =========================================
+   WORD / CHAR SPLIT ANIMATIONS
+   ========================================= */
+.word-wrap {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.word {
+  display: inline-block;
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.char {
+  display: inline-block;
+}
+
+/* =========================================
+   GLASS MORPHISM (Sparingly)
+   ========================================= */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* =========================================
+   LINK HOVER UNDERLINE ANIMATION
+   ========================================= */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #c8ff00;
+  transition: width 0.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* =========================================
+   MAGNETIC BUTTON BASE
+   ========================================= */
+.magnetic-wrap {
+  display: inline-flex;
+  position: relative;
+}
+
+/* =========================================
+   SCROLLTRIGGER HORIZONTAL SECTION
+   ========================================= */
+.horizontal-section {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100vh;
+}
+
+/* =========================================
+   CUSTOM CURSOR — Spotlight glow
+   (styles managed inline in CustomCursor.jsx)
+   ========================================= */
+
+/* =========================================
+   LOADER
+   ========================================= */
+.loader-container {
+  position: fixed;
+  inset: 0;
+  background: #080808;
+  z-index: 99990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: clamp(2rem, 5vw, 6rem);
+  overflow: hidden;
+}
+
+/* =========================================
+   SCROLL INDICATOR
+   ========================================= */
+.scroll-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+}
+
+.scroll-line {
+  width: 60px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #c8ff00;
+  animation: scrollLine 2s ease-in-out infinite;
+}
+
+@keyframes scrollLine {
+  0% { left: -100%; }
+  50% { left: 0%; }
+  100% { left: 100%; }
+}
+
+/* =========================================
+   HERO NAME — BlurText
+   ========================================= */
+.hero-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0 0 1.4rem 0 !important;
+  line-height: 1.2;
+  flex-wrap: nowrap !important;
+}
+
+.hero-name span {
+  /* each letter */
+  color: #888;
+}
+
+/* =========================================
+   HERO SUBTITLE — BlurText
+   ========================================= */
+.hero-subtitle {
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: #888;
+  max-width: 38ch;
+  line-height: 1.7;
+  margin: 0 0 2.5rem 0 !important;
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   PROJECT CARD IMAGE OVERLAY
+   ========================================= */
+.project-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.project-image-inner {
+  width: 100%;
+  height: 100%;
+  transform: scale(1.05);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-image:hover .project-image-inner {
+  transform: scale(1.0);
+}
+
+/* =========================================
+   MARQUEE
+   ========================================= */
+.marquee-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+/* =========================================
+   TIMELINE
+   ========================================= */
+.timeline-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 0;
+  background: linear-gradient(to bottom, #c8ff00, transparent);
+  transition: height 0.5s ease;
+}
+
+/* =========================================
+   GSAP INITIAL STATES
+   ========================================= */
+.gsap-hidden {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.gsap-hidden-left {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.clip-hidden {
+  clip-path: inset(0 100% 0 0);
+}
+
+/* =========================================
+   SECTION BORDERS
+   ========================================= */
+.section-border-top {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scroll-line::after {
+    animation: none;
+  }
+}
+
+/* =========================================
+   MOBILE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 768px) {
+  /* Spotlight cursor hidden on mobile (component returns null) */
+}
+
+/* =========================================
+   GLOW EFFECTS
+   ========================================= */
+.glow-accent {
+  box-shadow: 0 0 30px rgba(200, 255, 0, 0.2), 0 0 60px rgba(200, 255, 0, 0.1);
+}
+
+.text-glow {
+  text-shadow: 0 0 30px rgba(200, 255, 0, 0.3);
+}
+
+/* =========================================
+   FINE BORDER CARD
+   ========================================= */
+.fine-border {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: border-color 0.3s ease;
+}
+
+.fine-border:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* =========================================
+   LARGE DISPLAY TEXT
+   ========================================= */
+.display-text {
+  font-size: clamp(3rem, 10vw, 10rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.display-text-xl {
+  font-size: clamp(4rem, 14vw, 14rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+}
+
+/* =========================================
+   BUTTON STYLES
+   ========================================= */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 2rem;
+  background: #c8ff00;
+  color: #080808;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 30px rgba(200, 255, 0, 0.3);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 2rem;
+  background: transparent;
+  color: #eeebe4;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: none;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* =========================================
+   NUMBER COUNTER STYLE
+   ========================================= */
+.counter-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+/* =========================================
+   PROJECT NUMBER STYLE  
+   ========================================= */
+.project-num {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: #c8ff00;
+  text-transform: uppercase;
+}
