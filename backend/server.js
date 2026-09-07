@@ -1,3 +1,6 @@
+// Load .env when running directly (local dev); Vercel injects env vars automatically
+if (require.main === module) require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
