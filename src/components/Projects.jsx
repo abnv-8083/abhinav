@@ -403,9 +403,9 @@ export default function Projects() {
 
   // Horizontal scroll — re-runs whenever the project list changes
   useEffect(() => {
-    // Wait one frame so React has rendered the updated cards
+    let ctx;
     const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
+      ctx = gsap.context(() => {
         const track = trackRef.current;
         const cards = track?.querySelectorAll('article');
         if (!track || !cards?.length) return;
@@ -413,7 +413,7 @@ export default function Projects() {
         const totalWidth = Array.from(cards).reduce((acc, c) => acc + c.offsetWidth + 32, 0);
         const scrollDist = Math.max(0, totalWidth - window.innerWidth + 100);
 
-        if (scrollDist <= 0) return; // not enough cards to scroll
+        if (scrollDist <= 0) return;
 
         gsap.to(track, {
           x: -scrollDist,
@@ -449,13 +449,11 @@ export default function Projects() {
           }
         );
       }, sectionRef);
-
-      return () => ctx.revert();
     }, 50);
 
     return () => {
       clearTimeout(timer);
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      ctx?.revert(); // only revert THIS component's ScrollTriggers
     };
   }, [projects.length]);
 
