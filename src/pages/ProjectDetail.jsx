@@ -365,7 +365,7 @@ export default function ProjectDetail() {
             Other Projects
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {projects
+            {staticProjects
               .filter((p) => p.slug !== slug)
               .slice(0, 3)
               .map((p) => (
