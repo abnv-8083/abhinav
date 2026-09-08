@@ -144,7 +144,13 @@ export default function Footer() {
             opacity: 0,
           }}
         >
-          <span>Built with ❤️</span>
+          <span>Built with </span>
+          {['❤️', '👨🏽‍💻    '].map((tech, i) => (
+            <span key={tech}>
+              <span style={{ color: '#555', fontWeight: 500 }}>{tech}</span>
+              {i < 3 && <span style={{ color: '#222' }}> ·</span>}
+            </span>
+          ))}
         </div>
       </div>
     </footer>
