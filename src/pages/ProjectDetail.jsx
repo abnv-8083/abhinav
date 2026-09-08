@@ -148,13 +148,13 @@ export default function ProjectDetail() {
 
   return (
     <div ref={pageRef} style={{ minHeight: '100vh', opacity: 0 }}>
-      {/* Back button */}
+      {/* Back button — sits below navbar */}
       <div
         style={{
           position: 'fixed',
-          top: '1.5rem',
+          top: '5rem',
           left: '1.5rem',
-          zIndex: 100,
+          zIndex: 50,
         }}
       >
         <button
