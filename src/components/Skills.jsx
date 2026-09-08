@@ -155,6 +155,15 @@ export default function Skills() {
     return () => ctx.revert();
   }, []);
 
+  // Re-animate skill items whenever category changes
+  useEffect(() => {
+    gsap.fromTo(
+      '.skill-item-wrap',
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, stagger: 0.05, duration: 0.45, ease: 'power3.out' }
+    );
+  }, [activeCategory]);
+
   const currentCategory = skills[activeCategory];
 
   return (
@@ -308,7 +317,6 @@ export default function Skills() {
               <div
                 key={item.name}
                 className="skill-item-wrap"
-                style={{ opacity: 0 }}
               >
                 <SkillItem
                   item={item}
