@@ -66,23 +66,28 @@ export default function Experience() {
           scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
         }
       );
-      // Scroll-driven glow line fill — triggered on the timeline container itself
+      // Scroll-driven glow line fill — triggered from first to last timeline entry
       const glowLine = glowLineRef.current;
       const glowBloom = glowBloomRef.current;
       const targets = [glowLine, glowBloom].filter(Boolean);
       if (targets.length && timelineRef.current) {
-        // Set initial state via GSAP (avoids inline transform conflict)
-        gsap.set(targets, { scaleY: 0, transformOrigin: 'top center' });
-        gsap.to(targets, {
-          scaleY: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: 'top 80%',
-            end: 'bottom 20%',
-            scrub: 1.5,
-          },
-        });
+        const entries = timelineRef.current.querySelectorAll('.timeline-entry');
+        const firstEntry = entries[0];
+        const lastEntry = entries[entries.length - 1];
+        if (firstEntry && lastEntry) {
+          gsap.set(targets, { scaleY: 0, transformOrigin: 'top center' });
+          gsap.to(targets, {
+            scaleY: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: firstEntry,
+              endTrigger: lastEntry,
+              start: 'top 70%',
+              end: 'bottom 30%',
+              scrub: 1.5,
+            },
+          });
+        }
       }
     }, sectionRef);
 
