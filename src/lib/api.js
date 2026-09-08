@@ -3,8 +3,11 @@
  * Base URL reads from VITE_API_URL env var, falls back to localhost:4000.
  */
 
-const BASE = import.meta.env.VITE_API_URL
-  || (import.meta.env.PROD ? '/api' : 'http://localhost:4000/api');
+// In production (Vercel) always use relative /api — same domain, no CORS.
+// In local dev fall back to localhost:4000.
+const BASE = import.meta.env.PROD
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || 'http://localhost:4000/api');
 
 // Stored in sessionStorage so the admin doesn't have to re-enter password on every page
 const getToken = () => sessionStorage.getItem('admin_token') || '';
