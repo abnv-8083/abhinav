@@ -65,25 +65,18 @@ export default function Experience() {
           scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
         }
       );
-      // Scroll-driven glow line — clip-path reveals from top to bottom
+      // Scroll-driven glow line — smoothly scales Y from top to bottom
       if (glowWrapperRef.current && timelineRef.current) {
-        const entries = timelineRef.current.querySelectorAll('.timeline-entry');
-        const firstEntry = entries[0];
-        const lastEntry = entries[entries.length - 1];
-        if (firstEntry && lastEntry) {
-          gsap.set(glowWrapperRef.current, { clipPath: 'inset(0% 0% 100% 0%)' });
-          gsap.to(glowWrapperRef.current, {
-            clipPath: 'inset(0% 0% 0% 0%)',
-            ease: 'none',
-            scrollTrigger: {
-              trigger: firstEntry,
-              endTrigger: lastEntry,
-              start: 'top center',
-              end: 'bottom center',
-              scrub: true,
-            },
-          });
-        }
+        gsap.to(glowWrapperRef.current, {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: timelineRef.current,
+            start: 'top center',
+            end: 'bottom center',
+            scrub: 0.5,
+          },
+        });
       }
     }, sectionRef);
 
@@ -145,9 +138,8 @@ export default function Experience() {
           aria-hidden="true"
         />
 
-        {/* Scroll-driven glow fill — clip-path reveals top to bottom */}
+        {/* Scroll-driven glow fill wrapper */}
         <div
-          ref={glowWrapperRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
@@ -157,34 +149,45 @@ export default function Experience() {
             bottom: 0,
             width: '8px',
             pointerEvents: 'none',
-            clipPath: 'inset(0% 0% 100% 0%)',
           }}
         >
-          {/* Sharp glow line */}
+          {/* GSAP Animated Scale Container */}
           <div
+            ref={glowWrapperRef}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '1px',
+              width: '100%',
               height: '100%',
-              background: '#c8ff00',
-              boxShadow: '0 0 6px 2px rgba(200,255,0,0.8), 0 0 18px 6px rgba(200,255,0,0.3)',
+              transformOrigin: 'top center',
+              transform: 'scaleY(0)',
+              willChange: 'transform',
             }}
-          />
-          {/* Bloom blur */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '100%',
-              background: 'rgba(200,255,0,0.15)',
-              filter: 'blur(4px)',
-            }}
-          />
+          >
+            {/* Sharp glow line */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '1px',
+                height: '100%',
+                background: '#c8ff00',
+                boxShadow: '0 0 6px 2px rgba(200,255,0,0.8), 0 0 18px 6px rgba(200,255,0,0.3)',
+              }}
+            />
+            {/* Bloom blur */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '100%',
+                background: 'rgba(200,255,0,0.15)',
+                filter: 'blur(4px)',
+              }}
+            />
+          </div>
         </div>
 
         <div ref={timelineRef} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(3rem, 5vw, 5rem)' }}>
