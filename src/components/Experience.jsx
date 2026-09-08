@@ -72,15 +72,15 @@ export default function Experience() {
       if (targets.length) {
         gsap.fromTo(
           targets,
-          { scaleY: 0 },
+          { height: '0%' },
           {
-            scaleY: 1,
+            height: '100%',
             ease: 'none',
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: 'top 80%',
-              end: 'bottom 20%',
-              scrub: 1.5,
+              start: 'top 70%',
+              end: 'bottom 30%',
+              scrub: 2,
             },
           }
         );
@@ -145,42 +145,47 @@ export default function Experience() {
           aria-hidden="true"
         />
 
-        {/* Scroll-driven glow fill */}
+        {/* Scroll-driven glow fill — wrapper clips, inner div grows */}
         <div
-          ref={glowLineRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
             left: '50%',
-            transform: 'translateX(-50%) scaleY(0)',
-            transformOrigin: 'top center',
-            top: 0,
-            bottom: 0,
-            width: '1px',
-            background: 'linear-gradient(to bottom, transparent 0%, #c8ff00 15%, #c8ff00 85%, transparent 100%)',
-            boxShadow: '0 0 6px 2px rgba(200,255,0,0.55), 0 0 18px 4px rgba(200,255,0,0.2)',
-            willChange: 'transform',
-          }}
-        />
-
-        {/* Soft bloom blur duplicate */}
-        <div
-          ref={glowBloomRef}
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%) scaleY(0)',
-            transformOrigin: 'top center',
+            transform: 'translateX(-50%)',
             top: 0,
             bottom: 0,
             width: '3px',
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(200,255,0,0.3) 15%, rgba(200,255,0,0.3) 85%, transparent 100%)',
-            filter: 'blur(4px)',
+            overflow: 'hidden',
             pointerEvents: 'none',
-            willChange: 'transform',
           }}
-        />
+        >
+          {/* Sharp glow line */}
+          <div
+            ref={glowLineRef}
+            style={{
+              width: '1px',
+              height: '0%',
+              margin: '0 auto',
+              background: 'linear-gradient(to bottom, transparent 0%, #c8ff00 10%, #c8ff00 90%, transparent 100%)',
+              boxShadow: '0 0 6px 2px rgba(200,255,0,0.55), 0 0 18px 4px rgba(200,255,0,0.2)',
+              willChange: 'height',
+            }}
+          />
+          {/* Bloom blur */}
+          <div
+            ref={glowBloomRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '0%',
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(200,255,0,0.35) 10%, rgba(200,255,0,0.35) 90%, transparent 100%)',
+              filter: 'blur(4px)',
+              willChange: 'height',
+            }}
+          />
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(3rem, 5vw, 5rem)' }}>
           {experiences.map((exp, i) => (
