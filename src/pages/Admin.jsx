@@ -637,43 +637,111 @@ export default function Admin() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080808', display: 'flex' }}>
-      {/* Sidebar */}
-      <aside style={{ width: '220px', flexShrink: 0, borderRight: '1px solid #111', padding: '2rem 1.25rem', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '2.5rem' }}>
-          <div style={{ color: '#c8ff00', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Admin</div>
-          <div style={{ color: '#444', fontSize: '0.7rem', marginTop: '0.25rem' }}>Portfolio CMS</div>
+    <div style={{ minHeight: '100vh', background: '#080808', display: 'flex', flexDirection: 'column' }}>
+
+      {/* ── Mobile top bar ── */}
+      <div className="admin-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 1rem', borderBottom: '1px solid #111' }}>
+          <div>
+            <div style={{ color: '#c8ff00', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.15em' }}>ADMIN</div>
+            <div style={{ color: '#444', fontSize: '0.65rem' }}>Portfolio CMS</div>
+          </div>
+          <button onClick={logout} style={{ background: 'transparent', border: '1px solid #1a1a1a', borderRadius: '0.5rem', padding: '0.4rem 0.75rem', color: '#444', fontSize: '0.72rem', cursor: 'pointer' }}>
+            Sign out
+          </button>
         </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
+        {/* Horizontal scrollable nav tabs */}
+        <div style={{ display: 'flex', overflowX: 'auto', gap: '0.25rem', padding: '0.5rem 1rem', borderBottom: '1px solid #111', scrollbarWidth: 'none' }}>
           {SECTIONS.map(s => (
             <button key={s} onClick={() => setSection(s)}
               style={{
-                textAlign: 'left', background: section === s ? 'rgba(200,255,0,0.08)' : 'transparent',
-                border: 'none', borderRadius: '0.5rem', padding: '0.65rem 0.875rem',
-                color: section === s ? '#c8ff00' : '#666', fontSize: '0.82rem', fontWeight: section === s ? 600 : 400,
-                cursor: 'pointer', transition: 'all 0.2s',
+                flexShrink: 0, background: section === s ? 'rgba(200,255,0,0.08)' : 'transparent',
+                border: section === s ? '1px solid rgba(200,255,0,0.2)' : '1px solid transparent',
+                borderRadius: '100px', padding: '0.4rem 0.875rem',
+                color: section === s ? '#c8ff00' : '#666', fontSize: '0.75rem',
+                fontWeight: section === s ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap',
               }}
-              onMouseEnter={e => { if (section !== s) e.target.style.color = '#aaa'; }}
-              onMouseLeave={e => { if (section !== s) e.target.style.color = '#666'; }}
-            >
-              {s}
-            </button>
+            >{s}</button>
           ))}
-        </nav>
-        <button onClick={logout}
-          style={{ background: 'transparent', border: '1px solid #1a1a1a', borderRadius: '0.5rem', padding: '0.5rem 0.875rem', color: '#444', fontSize: '0.75rem', cursor: 'pointer', marginTop: 'auto' }}>
-          Sign out
-        </button>
-      </aside>
+        </div>
+      </div>
 
-      {/* Main content */}
-      <main style={{ flex: 1, padding: '2.5rem', overflowY: 'auto', maxWidth: '900px' }}>
-        {section === 'Projects'     && <ProjectsSection />}
-        {section === 'Skills'       && <SkillsSection />}
-        {section === 'Experience'   && <ExperienceSection />}
-        {section === 'About'        && <AboutSection />}
-        {section === 'Social Links' && <SocialLinksSection />}
-      </main>
+      {/* ── Desktop layout ── */}
+      <div className="admin-body">
+        {/* Sidebar — desktop only */}
+        <aside className="admin-sidebar">
+          <div style={{ marginBottom: '2.5rem' }}>
+            <div style={{ color: '#c8ff00', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Admin</div>
+            <div style={{ color: '#444', fontSize: '0.7rem', marginTop: '0.25rem' }}>Portfolio CMS</div>
+          </div>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1 }}>
+            {SECTIONS.map(s => (
+              <button key={s} onClick={() => setSection(s)}
+                style={{
+                  textAlign: 'left', background: section === s ? 'rgba(200,255,0,0.08)' : 'transparent',
+                  border: 'none', borderRadius: '0.5rem', padding: '0.65rem 0.875rem',
+                  color: section === s ? '#c8ff00' : '#666', fontSize: '0.82rem', fontWeight: section === s ? 600 : 400,
+                  cursor: 'pointer', transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { if (section !== s) e.target.style.color = '#aaa'; }}
+                onMouseLeave={e => { if (section !== s) e.target.style.color = '#666'; }}
+              >{s}</button>
+            ))}
+          </nav>
+          <button onClick={logout}
+            style={{ background: 'transparent', border: '1px solid #1a1a1a', borderRadius: '0.5rem', padding: '0.5rem 0.875rem', color: '#444', fontSize: '0.75rem', cursor: 'pointer', marginTop: 'auto' }}>
+            Sign out
+          </button>
+        </aside>
+
+        {/* Main content */}
+        <main className="admin-main">
+          {section === 'Projects'     && <ProjectsSection />}
+          {section === 'Skills'       && <SkillsSection />}
+          {section === 'Experience'   && <ExperienceSection />}
+          {section === 'About'        && <AboutSection />}
+          {section === 'Social Links' && <SocialLinksSection />}
+        </main>
+      </div>
+
+      <style>{`
+        /* Mobile: show top bar, hide sidebar */
+        .admin-topbar { display: flex; flex-direction: column; }
+        .admin-body   { display: flex; flex: 1; }
+        .admin-sidebar { display: none; }
+        .admin-main {
+          flex: 1;
+          padding: 1.25rem;
+          overflow-y: auto;
+          max-width: 100%;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        /* Desktop: hide top bar, show sidebar */
+        @media (min-width: 640px) {
+          .admin-topbar  { display: none; }
+          .admin-sidebar {
+            display: flex;
+            flex-direction: column;
+            width: 220px;
+            flex-shrink: 0;
+            border-right: 1px solid #111;
+            padding: 2rem 1.25rem;
+          }
+          .admin-main {
+            padding: 2.5rem;
+            max-width: 900px;
+          }
+        }
+
+        /* Mobile form inputs full width */
+        @media (max-width: 640px) {
+          input, textarea, select {
+            font-size: 16px !important; /* prevent iOS zoom */
+          }
+        }
+      `}</style>
     </div>
   );
 }
