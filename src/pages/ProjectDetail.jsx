@@ -60,12 +60,27 @@ export default function ProjectDetail() {
   useEffect(() => {
     setLoading(true);
     api.project(slug)
-      .then(data => { setProject(data); setLoading(false); })
+      .then(data => {
+        setProject(data);
+        setLoading(false);
+        // Track project view in GA4
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'project_view', {
+            project_slug: slug,
+            project_title: data?.title || slug,
+          });
+        }
+      })
       .catch(() => {
-        // API unavailable — try static fallback
         const fallback = staticProjects.find(p => p.slug === slug);
         setProject(fallback || null);
         setLoading(false);
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'project_view', {
+            project_slug: slug,
+            project_title: fallback?.title || slug,
+          });
+        }
       });
   }, [slug]);
 

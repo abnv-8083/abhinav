@@ -53,6 +53,14 @@ function ScrollToTop() {
       window.__lenis.scrollTo(0, { immediate: true });
     }
     ScrollTrigger.refresh();
+
+    // Track SPA page navigation in GA4
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: pathname,
+        page_title: document.title,
+      });
+    }
   }, [pathname]);
   return null;
 }
