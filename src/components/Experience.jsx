@@ -15,8 +15,7 @@ const TYPE_COLORS = {
 export default function Experience() {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
-  const glowLineRef = useRef(null);
-  const glowBloomRef = useRef(null);
+  const glowWrapperRef = useRef(null);
   const timelineRef = useRef(null);
 
   useEffect(() => {
@@ -66,25 +65,22 @@ export default function Experience() {
           scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
         }
       );
-      // Scroll-driven glow line fill — triggered from first to last timeline entry
-      const glowLine = glowLineRef.current;
-      const glowBloom = glowBloomRef.current;
-      const targets = [glowLine, glowBloom].filter(Boolean);
-      if (targets.length && timelineRef.current) {
+      // Scroll-driven glow line — clip-path reveals from top to bottom
+      if (glowWrapperRef.current && timelineRef.current) {
         const entries = timelineRef.current.querySelectorAll('.timeline-entry');
         const firstEntry = entries[0];
         const lastEntry = entries[entries.length - 1];
         if (firstEntry && lastEntry) {
-          gsap.set(targets, { scaleY: 0, transformOrigin: 'top center' });
-          gsap.to(targets, {
-            scaleY: 1,
+          gsap.set(glowWrapperRef.current, { clipPath: 'inset(0% 0% 100% 0%)' });
+          gsap.to(glowWrapperRef.current, {
+            clipPath: 'inset(0% 0% 0% 0%)',
             ease: 'none',
             scrollTrigger: {
               trigger: firstEntry,
               endTrigger: lastEntry,
-              start: 'top 70%',
-              end: 'bottom 30%',
-              scrub: 1.5,
+              start: 'top center',
+              end: 'bottom center',
+              scrub: true,
             },
           });
         }
@@ -149,8 +145,9 @@ export default function Experience() {
           aria-hidden="true"
         />
 
-        {/* Scroll-driven glow fill */}
+        {/* Scroll-driven glow fill — clip-path reveals top to bottom */}
         <div
+          ref={glowWrapperRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
@@ -158,13 +155,13 @@ export default function Experience() {
             transform: 'translateX(-50%)',
             top: 0,
             bottom: 0,
-            width: '3px',
+            width: '8px',
             pointerEvents: 'none',
+            clipPath: 'inset(0% 0% 100% 0%)',
           }}
         >
           {/* Sharp glow line */}
           <div
-            ref={glowLineRef}
             style={{
               position: 'absolute',
               top: 0,
@@ -172,23 +169,20 @@ export default function Experience() {
               transform: 'translateX(-50%)',
               width: '1px',
               height: '100%',
-              background: 'linear-gradient(to bottom, transparent 0%, #c8ff00 10%, #c8ff00 90%, transparent 100%)',
-              boxShadow: '0 0 6px 2px rgba(200,255,0,0.55), 0 0 18px 4px rgba(200,255,0,0.2)',
-              willChange: 'transform',
+              background: '#c8ff00',
+              boxShadow: '0 0 6px 2px rgba(200,255,0,0.8), 0 0 18px 6px rgba(200,255,0,0.3)',
             }}
           />
           {/* Bloom blur */}
           <div
-            ref={glowBloomRef}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               height: '100%',
-              background: 'linear-gradient(to bottom, transparent 0%, rgba(200,255,0,0.35) 10%, rgba(200,255,0,0.35) 90%, transparent 100%)',
+              background: 'rgba(200,255,0,0.15)',
               filter: 'blur(4px)',
-              willChange: 'transform',
             }}
           />
         </div>
