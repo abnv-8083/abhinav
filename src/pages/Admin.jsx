@@ -604,7 +604,10 @@ export default function Admin() {
     e.preventDefault();
     try {
       // Validate password by hitting a protected endpoint
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/about`, {
+      const apiBase = import.meta.env.PROD
+        ? '/api'
+        : (import.meta.env.VITE_API_URL || 'http://localhost:4000/api');
+      const res = await fetch(`${apiBase}/about`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${pw}` },
         body: JSON.stringify({}),
