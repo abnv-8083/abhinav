@@ -78,9 +78,9 @@ export default function Experience() {
             ease: 'none',
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: 'top 60%',
-              end: 'bottom 40%',
-              scrub: 0.6,
+              start: 'top 80%',
+              end: 'bottom 20%',
+              scrub: 1.5,
             },
           }
         );
