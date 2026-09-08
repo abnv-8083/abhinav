@@ -17,6 +17,7 @@ export default function Experience() {
   const titleRef = useRef(null);
   const glowLineRef = useRef(null);
   const glowBloomRef = useRef(null);
+  const timelineRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -65,25 +66,23 @@ export default function Experience() {
           scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
         }
       );
-      // Scroll-driven glow line fill
+      // Scroll-driven glow line fill — triggered on the timeline container itself
       const glowLine = glowLineRef.current;
       const glowBloom = glowBloomRef.current;
       const targets = [glowLine, glowBloom].filter(Boolean);
-      if (targets.length) {
-        gsap.fromTo(
-          targets,
-          { height: '0%' },
-          {
-            height: '100%',
-            ease: 'none',
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: 1,
-            },
-          }
-        );
+      if (targets.length && timelineRef.current) {
+        // Set initial state via GSAP (avoids inline transform conflict)
+        gsap.set(targets, { scaleY: 0, transformOrigin: 'top center' });
+        gsap.to(targets, {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: timelineRef.current,
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: 1.5,
+          },
+        });
       }
     }, sectionRef);
 
@@ -145,7 +144,7 @@ export default function Experience() {
           aria-hidden="true"
         />
 
-        {/* Scroll-driven glow fill — wrapper clips, inner div grows */}
+        {/* Scroll-driven glow fill */}
         <div
           aria-hidden="true"
           style={{
@@ -155,7 +154,6 @@ export default function Experience() {
             top: 0,
             bottom: 0,
             width: '3px',
-            overflow: 'hidden',
             pointerEvents: 'none',
           }}
         >
@@ -163,12 +161,15 @@ export default function Experience() {
           <div
             ref={glowLineRef}
             style={{
+              position: 'absolute',
+              top: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
               width: '1px',
-              height: '0%',
-              margin: '0 auto',
+              height: '100%',
               background: 'linear-gradient(to bottom, transparent 0%, #c8ff00 10%, #c8ff00 90%, transparent 100%)',
               boxShadow: '0 0 6px 2px rgba(200,255,0,0.55), 0 0 18px 4px rgba(200,255,0,0.2)',
-              willChange: 'height',
+              willChange: 'transform',
             }}
           />
           {/* Bloom blur */}
@@ -179,15 +180,15 @@ export default function Experience() {
               top: 0,
               left: 0,
               right: 0,
-              height: '0%',
+              height: '100%',
               background: 'linear-gradient(to bottom, transparent 0%, rgba(200,255,0,0.35) 10%, rgba(200,255,0,0.35) 90%, transparent 100%)',
               filter: 'blur(4px)',
-              willChange: 'height',
+              willChange: 'transform',
             }}
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(3rem, 5vw, 5rem)' }}>
+        <div ref={timelineRef} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(3rem, 5vw, 5rem)' }}>
           {experiences.map((exp, i) => (
             <div
               key={exp.year}
