@@ -173,7 +173,7 @@ export default function Navbar() {
               src="/favicon.svg"
               alt="Abhinav A M"
               style={{
-                height: '28px',
+                height: '42px',
                 width: 'auto',
                 objectFit: 'contain',
                 display: 'block',
