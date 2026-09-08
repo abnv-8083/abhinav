@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import ProfileCard from './ProfileCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -224,52 +225,25 @@ export default function About() {
           </div>
         </div>
 
-        {/* Right: Currently Exploring */}
-        <div ref={exploringRef}>
-          <p
-            style={{
-              fontSize: '0.65rem',
-              fontWeight: 500,
-              letterSpacing: '0.2em',
-              color: '#444',
-              textTransform: 'uppercase',
-              marginBottom: '1.5rem',
+        {/* Right: Profile Card */}
+        <div ref={exploringRef} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <ProfileCard
+            name="Abhinav"
+            title="Frontend Developer"
+            handle="abnv-8083"
+            status="Available for work"
+            contactText="Hire Me"
+            avatarUrl="/image-removebg-preview.png"
+            showUserInfo={true}
+            enableTilt={true}
+            enableMobileTilt={false}
+            behindGlowEnabled={true}
+            behindGlowColor="rgba(200, 255, 0, 0.25)"
+            innerGradient="linear-gradient(145deg, rgba(200,255,0,0.08) 0%, rgba(8,8,8,0.95) 60%)"
+            onContactClick={() => {
+              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
             }}
-          >
-            Currently Exploring
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            {exploringItems.map((item, i) => (
-              <div
-                key={item}
-                className="explore-item"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '1rem 0',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  opacity: 0,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: '0.6rem',
-                    color: '#333',
-                    fontWeight: 500,
-                    fontVariantNumeric: 'tabular-nums',
-                    minWidth: '1.5ch',
-                  }}
-                >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span style={{ fontSize: '0.95rem', color: '#eeebe4', fontWeight: 400 }}>
-                  {item}
-                </span>
-              </div>
-            ))}
-          </div>
+          />
         </div>
       </div>
 
