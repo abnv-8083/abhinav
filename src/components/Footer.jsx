@@ -144,13 +144,7 @@ export default function Footer() {
             opacity: 0,
           }}
         >
-          <span>Built with</span>
-          {['React', 'GSAP', 'Three.js', 'Vite'].map((tech, i) => (
-            <span key={tech}>
-              <span style={{ color: '#555', fontWeight: 500 }}>{tech}</span>
-              {i < 3 && <span style={{ color: '#222' }}> ·</span>}
-            </span>
-          ))}
+          <span>Built with ❤️</span>
         </div>
       </div>
     </footer>
