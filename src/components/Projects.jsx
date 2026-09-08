@@ -383,9 +383,9 @@ export default function Projects() {
   const titleRef = useRef(null);
   const progressRef = useRef(null);
 
+  // Title animation — runs once
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Title animation
       gsap.fromTo(
         titleRef.current,
         { opacity: 0, y: 60 },
@@ -397,52 +397,67 @@ export default function Projects() {
           scrollTrigger: { trigger: titleRef.current, start: 'top 85%' },
         }
       );
-
-      // Horizontal scroll
-      const track = trackRef.current;
-      const cards = track?.querySelectorAll('article');
-      if (!track || !cards?.length) return;
-
-      const totalWidth = Array.from(cards).reduce((acc, c) => acc + c.offsetWidth + 32, 0);
-      const scrollDist = totalWidth - window.innerWidth + 100;
-
-      const hScroll = gsap.to(track, {
-        x: -scrollDist,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: triggerRef.current,
-          pin: true,
-          scrub: 1,
-          end: () => `+=${scrollDist}`,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            if (progressRef.current) {
-              progressRef.current.style.width = `${self.progress * 100}%`;
-            }
-          },
-        },
-      });
-
-      // Card reveals
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 60 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: triggerRef.current,
-            start: 'top 80%',
-          },
-        }
-      );
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
+
+  // Horizontal scroll — re-runs whenever the project list changes
+  useEffect(() => {
+    // Wait one frame so React has rendered the updated cards
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        const track = trackRef.current;
+        const cards = track?.querySelectorAll('article');
+        if (!track || !cards?.length) return;
+
+        const totalWidth = Array.from(cards).reduce((acc, c) => acc + c.offsetWidth + 32, 0);
+        const scrollDist = Math.max(0, totalWidth - window.innerWidth + 100);
+
+        if (scrollDist <= 0) return; // not enough cards to scroll
+
+        gsap.to(track, {
+          x: -scrollDist,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: triggerRef.current,
+            pin: true,
+            scrub: 1,
+            end: () => `+=${scrollDist}`,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              if (progressRef.current) {
+                progressRef.current.style.width = `${self.progress * 100}%`;
+              }
+            },
+          },
+        });
+
+        // Card reveals
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 60 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.15,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: triggerRef.current,
+              start: 'top 80%',
+            },
+          }
+        );
+      }, sectionRef);
+
+      return () => ctx.revert();
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, [projects.length]);
 
   return (
     <section
