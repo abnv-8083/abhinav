@@ -1,3 +1,3 @@
 // Vercel serverless entry point — proxies all /api/* requests to Express
-require('dotenv').config({ path: require('path').join(__dirname, '../backend/.env') });
+// Note: Vercel injects env vars directly into process.env, no dotenv needed
 module.exports = require('../backend/server');
