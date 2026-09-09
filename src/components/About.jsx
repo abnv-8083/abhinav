@@ -222,7 +222,7 @@ export default function About() {
         <div ref={exploringRef} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <ProfileCard
             name="Abhinav"
-            title="Frontend Developer"
+            title="Fullstack Developer"
             handle="abnv-8083"
             status="Available for work"
             contactText="Hire Me"
