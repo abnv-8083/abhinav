@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import { api } from '../lib/api';
 
 // Restore native cursor on admin — global CSS sets cursor:none for the portfolio
@@ -100,14 +100,58 @@ const Tag = ({ text, onRemove }) => (
   </span>
 );
 
-const StatusMsg = ({ msg, type }) => msg ? (
-  <div style={{ padding: '0.75rem 1rem', borderRadius: '0.5rem', fontSize: '0.8rem', marginBottom: '1rem',
-    background: type === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(200,255,0,0.08)',
-    border: `1px solid ${type === 'error' ? 'rgba(239,68,68,0.3)' : 'rgba(200,255,0,0.2)'}`,
-    color: type === 'error' ? '#ef4444' : '#c8ff00' }}>
-    {msg}
-  </div>
-) : null;
+/* ─────────────────────────────────────────────────────────
+   Toast system
+───────────────────────────────────────────────────────── */
+const ToastContext = createContext(null);
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const idRef = useRef(0);
+
+  const toast = useCallback((msg, type = 'ok') => {
+    const id = ++idRef.current;
+    setToasts(prev => [...prev, { id, msg, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
+
+  return (
+    <ToastContext.Provider value={toast}>
+      {children}
+      <div style={{
+        position: 'fixed', bottom: '1.5rem', right: '1.5rem',
+        display: 'flex', flexDirection: 'column', gap: '0.6rem',
+        zIndex: 9999, pointerEvents: 'none',
+      }}>
+        {toasts.map(t => (
+          <div key={t.id} style={{
+            display: 'flex', alignItems: 'center', gap: '0.65rem',
+            padding: '0.75rem 1.1rem',
+            background: t.type === 'error' ? '#1a0a0a' : '#0d130a',
+            border: `1px solid ${t.type === 'error' ? 'rgba(239,68,68,0.4)' : 'rgba(200,255,0,0.3)'}`,
+            borderRadius: '0.65rem',
+            boxShadow: `0 8px 32px ${t.type === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(200,255,0,0.1)'}`,
+            fontSize: '0.8rem', fontWeight: 500,
+            color: t.type === 'error' ? '#ef4444' : '#c8ff00',
+            animation: 'toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+            pointerEvents: 'auto', minWidth: '220px', maxWidth: '360px',
+          }}>
+            <span style={{ fontSize: '1rem' }}>{t.type === 'error' ? '✕' : '✓'}</span>
+            {t.msg}
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateX(1.5rem) scale(0.95); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+      `}</style>
+    </ToastContext.Provider>
+  );
+}
+
+const useToast = () => useContext(ToastContext);
 
 /* ─────────────────────────────────────────────────────────
    Image uploader
@@ -169,8 +213,8 @@ function ProjectsSection() {
   const [projects, setProjects] = useState([]);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [status, setStatus] = useState({ msg: '', type: '' });
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const load = useCallback(async () => {
     try { setProjects(await api.projects()); } catch {}
@@ -185,19 +229,19 @@ function ProjectsSection() {
     bgGradient: '', featured: false, order: projects.length + 1,
   });
 
-  const startNew  = () => { setForm(blank()); setEditing('new'); setStatus({ msg: '', type: '' }); };
-  const startEdit = (p) => { setForm({ ...p }); setEditing(p._id); setStatus({ msg: '', type: '' }); };
+  const startNew  = () => { setForm(blank()); setEditing('new'); };
+  const startEdit = (p) => { setForm({ ...p }); setEditing(p._id); };
   const cancel    = () => { setEditing(null); setForm({}); };
 
   const save = async () => {
-    setLoading(true); setStatus({ msg: '', type: '' });
+    setLoading(true);
     try {
       if (editing === 'new') await api.admin.createProject(form);
       else await api.admin.updateProject(editing, form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
+      toast('Project saved!', 'ok');
       await load(); cancel();
     } catch (e) {
-      setStatus({ msg: e.message, type: 'error' });
+      toast(e.message, 'error');
     } finally { setLoading(false); }
   };
 
@@ -215,7 +259,6 @@ function ProjectsSection() {
         <Btn variant="ghost" onClick={cancel}>← Back</Btn>
         <h3 style={{ color: '#eeebe4', fontWeight: 600 }}>{editing === 'new' ? 'New Project' : 'Edit Project'}</h3>
       </div>
-      <StatusMsg {...status} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Input label="Slug *" value={form.slug || ''} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} />
         <Input label="Title *" value={form.title || ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
@@ -291,7 +334,7 @@ function SkillsSection() {
   const [cats, setCats] = useState([]);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [status, setStatus] = useState({ msg: '', type: '' });
+  const toast = useToast();
 
   const load = useCallback(async () => {
     try { setCats(await api.skills()); } catch {}
@@ -315,9 +358,9 @@ function SkillsSection() {
     try {
       if (editing === 'new') await api.admin.createSkillCat(form);
       else await api.admin.updateSkillCat(editing, form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
+      toast('Skills saved!', 'ok');
       await load(); cancel();
-    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+    } catch (e) { toast(e.message, 'error'); }
   };
 
   const del = async (id) => {
@@ -331,7 +374,6 @@ function SkillsSection() {
         <Btn variant="ghost" onClick={cancel}>← Back</Btn>
         <h3 style={{ color: '#eeebe4', fontWeight: 600 }}>{editing === 'new' ? 'New Category' : 'Edit Category'}</h3>
       </div>
-      <StatusMsg {...status} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
         <Input label="Category name" value={form.category || ''} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
         <Input label="Order" type="number" value={form.order || 0} onChange={e => setForm(f => ({ ...f, order: +e.target.value }))} />
@@ -389,7 +431,7 @@ function ExperienceSection() {
   const [items, setItems] = useState([]);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [status, setStatus] = useState({ msg: '', type: '' });
+  const toast = useToast();
 
   const load = useCallback(async () => {
     try { setItems(await api.experience()); } catch {}
@@ -405,14 +447,14 @@ function ExperienceSection() {
     try {
       if (editing === 'new') await api.admin.createExp(form);
       else await api.admin.updateExp(editing, form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
+      toast('Experience saved!', 'ok');
       await load(); cancel();
-    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+    } catch (e) { toast(e.message, 'error'); }
   };
 
   const del = async (id) => {
     if (!window.confirm('Delete?')) return;
-    try { await api.admin.deleteExp(id); await load(); } catch (e) { alert(e.message); }
+    try { await api.admin.deleteExp(id); await load(); } catch (e) { toast(e.message, 'error'); }
   };
 
   if (editing !== null) return (
@@ -421,7 +463,6 @@ function ExperienceSection() {
         <Btn variant="ghost" onClick={cancel}>← Back</Btn>
         <h3 style={{ color: '#eeebe4', fontWeight: 600 }}>Experience Entry</h3>
       </div>
-      <StatusMsg {...status} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Input label="Year" value={form.year || ''} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
         <Input label="Title" value={form.title || ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
@@ -476,7 +517,7 @@ function ExperienceSection() {
 ───────────────────────────────────────────────────────── */
 function HeroSection() {
   const [form, setForm] = useState({});
-  const [status, setStatus] = useState({ msg: '', type: '' });
+  const toast = useToast();
 
   useEffect(() => {
     api.hero().then(setForm).catch(() => {});
@@ -485,8 +526,8 @@ function HeroSection() {
   const save = async () => {
     try {
       await api.admin.updateHero(form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
-    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+      toast('Hero saved!', 'ok');
+    } catch (e) { toast(e.message, 'error'); }
   };
 
   const f = (key) => ({ value: form[key] ?? '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
@@ -497,7 +538,6 @@ function HeroSection() {
   return (
     <div>
       <SectionTitle>Hero</SectionTitle>
-      <StatusMsg {...status} />
 
       {/* ── Status badge ── */}
       <div style={groupStyle}>
@@ -552,7 +592,7 @@ function HeroSection() {
 ───────────────────────────────────────────────────────── */
 function AboutSection() {
   const [form, setForm] = useState({});
-  const [status, setStatus] = useState({ msg: '', type: '' });
+  const toast = useToast();
 
   useEffect(() => {
     api.about().then(setForm).catch(() => {});
@@ -561,8 +601,8 @@ function AboutSection() {
   const save = async () => {
     try {
       await api.admin.updateAbout(form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
-    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+      toast('About saved!', 'ok');
+    } catch (e) { toast(e.message, 'error'); }
   };
 
   const f = (key) => ({ value: form[key] ?? '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
@@ -573,7 +613,6 @@ function AboutSection() {
   return (
     <div>
       <SectionTitle>About</SectionTitle>
-      <StatusMsg {...status} />
 
       {/* ── Big animated text ── */}
       <div style={groupStyle}>
@@ -629,7 +668,7 @@ function SocialLinksSection() {
   const [links, setLinks] = useState([]);
   const [form, setForm] = useState({ platform: '', label: '', href: '', value: '', icon: 'Globe', order: 1 });
   const [editId, setEditId] = useState(null);
-  const [status, setStatus] = useState({ msg: '', type: '' });
+  const toast = useToast();
 
   const load = useCallback(async () => {
     try { setLinks(await api.socialLinks()); } catch {}
@@ -643,20 +682,19 @@ function SocialLinksSection() {
     try {
       if (editId) await api.admin.updateLink(editId, form);
       else await api.admin.createLink(form);
-      setStatus({ msg: 'Saved ✓', type: 'ok' });
+      toast('Link saved!', 'ok');
       await load(); cancel();
-    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+    } catch (e) { toast(e.message, 'error'); }
   };
 
   const del = async (id) => {
     if (!window.confirm('Delete?')) return;
-    try { await api.admin.deleteLink(id); await load(); } catch (e) { alert(e.message); }
+    try { await api.admin.deleteLink(id); await load(); } catch (e) { toast(e.message, 'error'); }
   };
 
   return (
     <div>
       <SectionTitle>Social Links</SectionTitle>
-      <StatusMsg {...status} />
       <Card style={{ marginBottom: '1.5rem' }}>
         <h4 style={{ color: '#eeebe4', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1rem' }}>{editId ? 'Edit Link' : 'Add Link'}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -729,7 +767,7 @@ export default function Admin() {
       <form onSubmit={login} style={{ width: '100%', maxWidth: '360px', padding: '2rem' }}>
         <h1 style={{ color: '#eeebe4', fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Admin</h1>
         <p style={{ color: '#444', fontSize: '0.85rem', marginBottom: '2rem' }}>Portfolio CMS</p>
-        {pwErr && <StatusMsg msg={pwErr} type="error" />}
+        {pwErr && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginBottom: '1rem' }}>{pwErr}</p>}
         <div style={{ marginBottom: '1rem' }}>
           <Input label="Password" type="password" value={pw} onChange={e => { setPw(e.target.value); setPwErr(''); }} autoFocus />
         </div>
@@ -848,3 +886,7 @@ export default function Admin() {
     </div>
   );
 }
+
+// Wrap with ToastProvider so all child sections can call useToast()
+const AdminWithToast = () => <ToastProvider><Admin /></ToastProvider>;
+export { AdminWithToast as default };
