@@ -8,14 +8,7 @@ gsap.registerPlugin(ScrollTrigger);
 const ABOUT_WORDS =
   "I don't just build websites. I build experiences that move people.".split(' ');
 
-const exploringItems = [
-  'Creative Coding',
-  'WebGL & GLSL Shaders',
-  'Three.js & R3F',
-  'GSAP Advanced Patterns',
-  'AI & Generative Design',
-  'Modern Frontend Architecture',
-];
+
 
 export default function About() {
   const sectionRef = useRef(null);

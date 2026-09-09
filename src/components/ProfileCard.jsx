@@ -8,18 +8,17 @@ const ANIMATION_CONFIG = {
   INITIAL_X_OFFSET: 70,
   INITIAL_Y_OFFSET: 60,
   DEVICE_BETA_OFFSET: 20,
-  ENTER_TRANSITION_MS: 180,
+  ENTER_TRANSITION_MS: 180
 };
 
 const clamp = (v, min = 0, max = 100) => Math.min(Math.max(v, min), max);
 const round = (v, precision = 3) => parseFloat(v.toFixed(precision));
-const adjust = (v, fMin, fMax, tMin, tMax) =>
-  round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
+const adjust = (v, fMin, fMax, tMin, tMax) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
 
 const ProfileCardComponent = ({
-  avatarUrl = '',
-  iconUrl = '',
-  grainUrl = '',
+  avatarUrl = '<Placeholder for avatar URL>',
+  iconUrl = '<Placeholder for icon URL>',
+  grainUrl = '<Placeholder for grain URL>',
   innerGradient,
   behindGlowEnabled = true,
   behindGlowColor,
@@ -29,16 +28,17 @@ const ProfileCardComponent = ({
   enableMobileTilt = false,
   mobileTiltSensitivity = 5,
   miniAvatarUrl,
-  name = 'Abhinav',
-  title = 'Frontend Developer',
-  handle = 'abnv',
-  status = 'Available for work',
-  contactText = 'Hire Me',
+  name = 'Javi A. Torres',
+  title = 'Software Engineer',
+  handle = 'javicodes',
+  status = 'Online',
+  contactText = 'Contact',
   showUserInfo = true,
-  onContactClick,
+  onContactClick
 }) => {
   const wrapRef = useRef(null);
   const shellRef = useRef(null);
+
   const enterTimerRef = useRef(null);
   const leaveRafRef = useRef(null);
 
@@ -48,7 +48,11 @@ const ProfileCardComponent = ({
     let rafId = null;
     let running = false;
     let lastTs = 0;
-    let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
+
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
 
     const DEFAULT_TAU = 0.14;
     const INITIAL_TAU = 0.6;
@@ -58,12 +62,16 @@ const ProfileCardComponent = ({
       const shell = shellRef.current;
       const wrap = wrapRef.current;
       if (!shell || !wrap) return;
+
       const width = shell.clientWidth || 1;
       const height = shell.clientHeight || 1;
+
       const percentX = clamp((100 / width) * x);
       const percentY = clamp((100 / height) * y);
+
       const centerX = percentX - 50;
       const centerY = percentY - 50;
+
       const properties = {
         '--pointer-x': `${percentX}%`,
         '--pointer-y': `${percentY}%`,
@@ -73,8 +81,9 @@ const ProfileCardComponent = ({
         '--pointer-from-top': `${percentY / 100}`,
         '--pointer-from-left': `${percentX / 100}`,
         '--rotate-x': `${round(-(centerX / 5))}deg`,
-        '--rotate-y': `${round(centerY / 4)}deg`,
+        '--rotate-y': `${round(centerY / 4)}deg`
       };
+
       for (const [k, v] of Object.entries(properties)) wrap.style.setProperty(k, v);
     };
 
@@ -83,18 +92,26 @@ const ProfileCardComponent = ({
       if (lastTs === 0) lastTs = ts;
       const dt = (ts - lastTs) / 1000;
       lastTs = ts;
+
       const tau = ts < initialUntil ? INITIAL_TAU : DEFAULT_TAU;
       const k = 1 - Math.exp(-dt / tau);
+
       currentX += (targetX - currentX) * k;
       currentY += (targetY - currentY) * k;
+
       setVarsFromXY(currentX, currentY);
+
       const stillFar = Math.abs(targetX - currentX) > 0.05 || Math.abs(targetY - currentY) > 0.05;
+
       if (stillFar || document.hasFocus()) {
         rafId = requestAnimationFrame(step);
       } else {
         running = false;
         lastTs = 0;
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
       }
     };
 
@@ -106,16 +123,34 @@ const ProfileCardComponent = ({
     };
 
     return {
-      setImmediate(x, y) { currentX = x; currentY = y; setVarsFromXY(currentX, currentY); },
-      setTarget(x, y) { targetX = x; targetY = y; start(); },
+      setImmediate(x, y) {
+        currentX = x;
+        currentY = y;
+        setVarsFromXY(currentX, currentY);
+      },
+      setTarget(x, y) {
+        targetX = x;
+        targetY = y;
+        start();
+      },
       toCenter() {
         const shell = shellRef.current;
         if (!shell) return;
         this.setTarget(shell.clientWidth / 2, shell.clientHeight / 2);
       },
-      beginInitial(durationMs) { initialUntil = performance.now() + durationMs; start(); },
-      getCurrent() { return { x: currentX, y: currentY, tx: targetX, ty: targetY }; },
-      cancel() { if (rafId) cancelAnimationFrame(rafId); rafId = null; running = false; lastTs = 0; },
+      beginInitial(durationMs) {
+        initialUntil = performance.now() + durationMs;
+        start();
+      },
+      getCurrent() {
+        return { x: currentX, y: currentY, tx: targetX, ty: targetY };
+      },
+      cancel() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        running = false;
+        lastTs = 0;
+      }
     };
   }, [enableTilt]);
 
@@ -124,30 +159,44 @@ const ProfileCardComponent = ({
     return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
   };
 
-  const handlePointerMove = useCallback(event => {
-    const shell = shellRef.current;
-    if (!shell || !tiltEngine) return;
-    const { x, y } = getOffsets(event, shell);
-    tiltEngine.setTarget(x, y);
-  }, [tiltEngine]);
+  const handlePointerMove = useCallback(
+    event => {
+      const shell = shellRef.current;
+      if (!shell || !tiltEngine) return;
+      const { x, y } = getOffsets(event, shell);
+      tiltEngine.setTarget(x, y);
+    },
+    [tiltEngine]
+  );
 
-  const handlePointerEnter = useCallback(event => {
-    const shell = shellRef.current;
-    if (!shell || !tiltEngine) return;
-    shell.classList.add('active', 'entering');
-    if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
-    enterTimerRef.current = window.setTimeout(() => shell.classList.remove('entering'), ANIMATION_CONFIG.ENTER_TRANSITION_MS);
-    const { x, y } = getOffsets(event, shell);
-    tiltEngine.setTarget(x, y);
-  }, [tiltEngine]);
+  const handlePointerEnter = useCallback(
+    event => {
+      const shell = shellRef.current;
+      if (!shell || !tiltEngine) return;
+
+      shell.classList.add('active');
+      shell.classList.add('entering');
+      if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
+      enterTimerRef.current = window.setTimeout(() => {
+        shell.classList.remove('entering');
+      }, ANIMATION_CONFIG.ENTER_TRANSITION_MS);
+
+      const { x, y } = getOffsets(event, shell);
+      tiltEngine.setTarget(x, y);
+    },
+    [tiltEngine]
+  );
 
   const handlePointerLeave = useCallback(() => {
     const shell = shellRef.current;
     if (!shell || !tiltEngine) return;
+
     tiltEngine.toCenter();
+
     const checkSettle = () => {
       const { x, y, tx, ty } = tiltEngine.getCurrent();
-      if (Math.hypot(tx - x, ty - y) < 0.6) {
+      const settled = Math.hypot(tx - x, ty - y) < 0.6;
+      if (settled) {
         shell.classList.remove('active');
         leaveRafRef.current = null;
       } else {
@@ -158,36 +207,57 @@ const ProfileCardComponent = ({
     leaveRafRef.current = requestAnimationFrame(checkSettle);
   }, [tiltEngine]);
 
-  const handleDeviceOrientation = useCallback(event => {
-    const shell = shellRef.current;
-    if (!shell || !tiltEngine) return;
-    const { beta, gamma } = event;
-    if (beta == null || gamma == null) return;
-    const centerX = shell.clientWidth / 2;
-    const centerY = shell.clientHeight / 2;
-    const x = clamp(centerX + gamma * mobileTiltSensitivity, 0, shell.clientWidth);
-    const y = clamp(centerY + (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity, 0, shell.clientHeight);
-    tiltEngine.setTarget(x, y);
-  }, [tiltEngine, mobileTiltSensitivity]);
+  const handleDeviceOrientation = useCallback(
+    event => {
+      const shell = shellRef.current;
+      if (!shell || !tiltEngine) return;
+
+      const { beta, gamma } = event;
+      if (beta == null || gamma == null) return;
+
+      const centerX = shell.clientWidth / 2;
+      const centerY = shell.clientHeight / 2;
+      const x = clamp(centerX + gamma * mobileTiltSensitivity, 0, shell.clientWidth);
+      const y = clamp(
+        centerY + (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity,
+        0,
+        shell.clientHeight
+      );
+
+      tiltEngine.setTarget(x, y);
+    },
+    [tiltEngine, mobileTiltSensitivity]
+  );
 
   useEffect(() => {
     if (!enableTilt || !tiltEngine) return;
+
     const shell = shellRef.current;
     if (!shell) return;
 
-    shell.addEventListener('pointerenter', handlePointerEnter);
-    shell.addEventListener('pointermove', handlePointerMove);
-    shell.addEventListener('pointerleave', handlePointerLeave);
+    const pointerMoveHandler = handlePointerMove;
+    const pointerEnterHandler = handlePointerEnter;
+    const pointerLeaveHandler = handlePointerLeave;
+    const deviceOrientationHandler = handleDeviceOrientation;
+
+    shell.addEventListener('pointerenter', pointerEnterHandler);
+    shell.addEventListener('pointermove', pointerMoveHandler);
+    shell.addEventListener('pointerleave', pointerLeaveHandler);
 
     const handleClick = () => {
       if (!enableMobileTilt || location.protocol !== 'https:') return;
       const anyMotion = window.DeviceMotionEvent;
       if (anyMotion && typeof anyMotion.requestPermission === 'function') {
-        anyMotion.requestPermission().then(state => {
-          if (state === 'granted') window.addEventListener('deviceorientation', handleDeviceOrientation);
-        }).catch(console.error);
+        anyMotion
+          .requestPermission()
+          .then(state => {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', deviceOrientationHandler);
+            }
+          })
+          .catch(console.error);
       } else {
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
+        window.addEventListener('deviceorientation', deviceOrientationHandler);
       }
     };
     shell.addEventListener('click', handleClick);
@@ -199,27 +269,40 @@ const ProfileCardComponent = ({
     tiltEngine.beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
 
     return () => {
-      shell.removeEventListener('pointerenter', handlePointerEnter);
-      shell.removeEventListener('pointermove', handlePointerMove);
-      shell.removeEventListener('pointerleave', handlePointerLeave);
+      shell.removeEventListener('pointerenter', pointerEnterHandler);
+      shell.removeEventListener('pointermove', pointerMoveHandler);
+      shell.removeEventListener('pointerleave', pointerLeaveHandler);
       shell.removeEventListener('click', handleClick);
-      window.removeEventListener('deviceorientation', handleDeviceOrientation);
+      window.removeEventListener('deviceorientation', deviceOrientationHandler);
       if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
       if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
       tiltEngine.cancel();
       shell.classList.remove('entering');
     };
-  }, [enableTilt, enableMobileTilt, tiltEngine, handlePointerMove, handlePointerEnter, handlePointerLeave, handleDeviceOrientation]);
+  }, [
+    enableTilt,
+    enableMobileTilt,
+    tiltEngine,
+    handlePointerMove,
+    handlePointerEnter,
+    handlePointerLeave,
+    handleDeviceOrientation
+  ]);
 
-  const cardStyle = useMemo(() => ({
-    '--icon': iconUrl ? `url(${iconUrl})` : 'none',
-    '--grain': grainUrl ? `url(${grainUrl})` : 'none',
-    '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
-    '--behind-glow-color': behindGlowColor ?? 'rgba(200, 255, 0, 0.3)',
-    '--behind-glow-size': behindGlowSize ?? '50%',
-  }), [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize]);
+  const cardStyle = useMemo(
+    () => ({
+      '--icon': iconUrl ? `url(${iconUrl})` : 'none',
+      '--grain': grainUrl ? `url(${grainUrl})` : 'none',
+      '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
+      '--behind-glow-color': behindGlowColor ?? 'rgba(125, 190, 255, 0.67)',
+      '--behind-glow-size': behindGlowSize ?? '50%'
+    }),
+    [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize]
+  );
 
-  const handleContactClick = useCallback(() => { onContactClick?.(); }, [onContactClick]);
+  const handleContactClick = useCallback(() => {
+    onContactClick?.();
+  }, [onContactClick]);
 
   return (
     <div ref={wrapRef} className={`pc-card-wrapper ${className}`.trim()} style={cardStyle}>
@@ -235,7 +318,10 @@ const ProfileCardComponent = ({
                 src={avatarUrl}
                 alt={`${name || 'User'} avatar`}
                 loading="lazy"
-                onError={e => { e.target.style.display = 'none'; }}
+                onError={e => {
+                  const t = e.target;
+                  t.style.display = 'none';
+                }}
               />
               {showUserInfo && (
                 <div className="pc-user-info">
@@ -245,7 +331,11 @@ const ProfileCardComponent = ({
                         src={miniAvatarUrl || avatarUrl}
                         alt={`${name || 'User'} mini avatar`}
                         loading="lazy"
-                        onError={e => { e.target.style.opacity = '0.5'; }}
+                        onError={e => {
+                          const t = e.target;
+                          t.style.opacity = '0.5';
+                          t.src = avatarUrl;
+                        }}
                       />
                     </div>
                     <div className="pc-user-text">
