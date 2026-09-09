@@ -247,8 +247,8 @@ function ProjectsSection() {
 
   const del = async (id) => {
     if (!window.confirm('Delete this project?')) return;
-    try { await api.admin.deleteProject(id); await load(); }
-    catch (e) { alert(e.message); }
+    try { await api.admin.deleteProject(id); await load(); toast('Project deleted', 'ok'); }
+    catch (e) { toast(e.message, 'error'); }
   };
 
   const setArr = (key, raw) => setForm(f => ({ ...f, [key]: raw.split(',').map(s => s.trim()).filter(Boolean) }));
@@ -365,7 +365,7 @@ function SkillsSection() {
 
   const del = async (id) => {
     if (!window.confirm('Delete category?')) return;
-    try { await api.admin.deleteSkillCat(id); await load(); } catch (e) { alert(e.message); }
+    try { await api.admin.deleteSkillCat(id); await load(); toast('Category deleted', 'ok'); } catch (e) { toast(e.message, 'error'); }
   };
 
   if (editing !== null) return (
@@ -733,12 +733,13 @@ function SocialLinksSection() {
 ───────────────────────────────────────────────────────── */
 const SECTIONS = ['Projects', 'Skills', 'Experience', 'Hero', 'About', 'Social Links'];
 
-export default function Admin() {
+function Admin() {
   useAdminCursor(); // restore native cursor — portfolio CSS hides it globally
   const [authed, setAuthed] = useState(() => !!sessionStorage.getItem('admin_token'));
   const [pw, setPw] = useState('');
   const [pwErr, setPwErr] = useState('');
   const [section, setSection] = useState('Projects');
+  const toast = useToast();
 
   const login = async (e) => {
     e.preventDefault();
@@ -755,8 +756,10 @@ export default function Admin() {
       if (res.status === 401) throw new Error('Wrong password');
       sessionStorage.setItem('admin_token', pw);
       setAuthed(true);
+      toast('Signed in successfully', 'ok');
     } catch (e) {
       setPwErr(e.message);
+      toast(e.message, 'error');
     }
   };
 
