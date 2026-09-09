@@ -227,6 +227,8 @@ export default function About() {
             status="Available for work"
             contactText="Hire Me"
             avatarUrl="/image-removebg-preview.png"
+            iconUrl="/iconpattern.jpg"
+            grainUrl="/iconpattern.jpg"
             showUserInfo={true}
             enableTilt={true}
             enableMobileTilt={false}
