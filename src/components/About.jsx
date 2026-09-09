@@ -1,24 +1,34 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ProfileCard from './ProfileCard';
+import { api } from '../lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ABOUT_WORDS =
-  "I don't just build websites. I build experiences that move people.".split(' ');
-
-
+const DEFAULT_BIG_TEXT    = "I don't just build websites. I build experiences that move people.";
+const DEFAULT_INTRO_1     = "I'm a frontend developer focused on creating modern interfaces, interactive experiences and performant web applications.";
+const DEFAULT_INTRO_2     = 'Based in Kerala, India, I combine technical precision with creative thinking to deliver digital products that stand out. I believe the best websites are the ones you feel before you understand.';
 
 export default function About() {
-  const sectionRef = useRef(null);
-  const bigTextRef = useRef(null);
-  const introRef = useRef(null);
-  const exploringRef = useRef(null);
+  const sectionRef    = useRef(null);
+  const bigTextRef    = useRef(null);
+  const introRef      = useRef(null);
+  const exploringRef  = useRef(null);
+
+  const [aboutData, setAboutData] = useState(null);
+
+  useEffect(() => {
+    api.about().then(setAboutData).catch(() => {});
+  }, []);
+
+  const bigText    = aboutData?.bigText    || DEFAULT_BIG_TEXT;
+  const introText1 = aboutData?.introParagraph  || DEFAULT_INTRO_1;
+  const introText2 = aboutData?.introParagraph2 || DEFAULT_INTRO_2;
+  const aboutWords = bigText.split(' ');
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Pinned word-by-word text reveal
       const words = bigTextRef.current?.querySelectorAll('.about-word');
       if (words?.length) {
         gsap.fromTo(
@@ -128,9 +138,9 @@ export default function About() {
           marginBottom: 'clamp(4rem, 8vw, 8rem)',
           maxWidth: '18ch',
         }}
-        aria-label="I don't just build websites. I build experiences that move people."
+        aria-label={bigText}
       >
-        {ABOUT_WORDS.map((word, i) => (
+        {aboutWords.map((word, i) => (
           <span
             key={i}
             className="about-word"
@@ -165,10 +175,7 @@ export default function About() {
               marginBottom: '2rem',
             }}
           >
-            I'm a frontend developer focused on creating{' '}
-            <span style={{ color: '#eeebe4' }}>modern interfaces</span>,{' '}
-            <span style={{ color: '#eeebe4' }}>interactive experiences</span> and{' '}
-            <span style={{ color: '#eeebe4' }}>performant web applications</span>.
+            {introText1}
           </p>
 
           <p
@@ -178,9 +185,7 @@ export default function About() {
               lineHeight: 1.8,
             }}
           >
-            Based in Kerala, India, I combine technical precision with creative thinking
-            to deliver digital products that stand out. I believe the best websites
-            are the ones you feel before you understand.
+            {introText2}
           </p>
 
           {/* Stats */}

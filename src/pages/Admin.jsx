@@ -509,7 +509,19 @@ function AboutSection() {
         </div>
         <Input label="Resume URL" {...f('resumeUrl')} />
         <div style={{ gridColumn: '1/-1' }}>
-          <Textarea label="Bio" rows={4} {...f('bio')} />
+          <Textarea label="Bio (sidebar)" rows={4} {...f('bio')} />
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <Textarea label="Big Animated Text" rows={2} {...f('bigText')}
+            placeholder="I don't just build websites. I build experiences that move people." />
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <Textarea label="Intro Paragraph (first)" rows={3} {...f('introParagraph')}
+            placeholder="I'm a frontend developer focused on..." />
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <Textarea label="Intro Paragraph (second)" rows={3} {...f('introParagraph2')}
+            placeholder="Based in Kerala, India..." />
         </div>
         <div style={{ gridColumn: '1/-1' }}>
           <ImageUploader value={form.avatar || ''} onChange={url => setForm(p => ({ ...p, avatar: url }))} />
