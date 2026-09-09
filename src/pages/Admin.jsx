@@ -489,48 +489,62 @@ function AboutSection() {
     } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
   };
 
-  const f = (key) => ({ value: form[key] || '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
+  const f = (key) => ({ value: form[key] ?? '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
+
+  const groupStyle = { marginBottom: '2rem' };
+  const groupLabel = { fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' };
 
   return (
     <div>
       <SectionTitle>About</SectionTitle>
       <StatusMsg {...status} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <Input label="Name" {...f('name')} />
-        <Input label="Headline" {...f('headline')} />
-        <Input label="Location" {...f('location')} />
-        <Input label="Focus" {...f('focus')} />
-        <Input label="Status" {...f('status')} />
-        <div>
-          <label style={{ fontSize: '0.75rem', color: '#888', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <input type="checkbox" checked={!!form.available} onChange={e => setForm(p => ({ ...p, available: e.target.checked }))} />
-            Available for work
-          </label>
-        </div>
-        <Input label="Resume URL" {...f('resumeUrl')} />
-        <div style={{ gridColumn: '1/-1' }}>
-          <Textarea label="Bio (sidebar)" rows={4} {...f('bio')} />
-        </div>
-        <div style={{ gridColumn: '1/-1' }}>
-          <Textarea label="Big Animated Text" rows={2} {...f('bigText')}
-            placeholder="I don't just build websites. I build experiences that move people." />
-        </div>
-        <div style={{ gridColumn: '1/-1' }}>
-          <Textarea label="Intro Paragraph (first)" rows={3} {...f('introParagraph')}
-            placeholder="I'm a frontend developer focused on..." />
-        </div>
-        <div style={{ gridColumn: '1/-1' }}>
-          <Textarea label="Intro Paragraph (second)" rows={3} {...f('introParagraph2')}
-            placeholder="Based in Kerala, India..." />
-        </div>
-        <div style={{ gridColumn: '1/-1' }}>
-          <ImageUploader value={form.avatar || ''} onChange={url => setForm(p => ({ ...p, avatar: url }))} />
+
+      {/* ── Big animated text ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Big Animated Text</span>
+        <Textarea rows={2} {...f('bigText')} placeholder="I don't just build websites. I build experiences that move people." />
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>Tip: the word "experiences" is automatically highlighted in lime.</p>
+      </div>
+
+      {/* ── Intro paragraphs ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Intro Paragraphs</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <Textarea label="Paragraph 1 (larger, lighter)" rows={3} {...f('introParagraph')} />
+          <Textarea label="Paragraph 2 (smaller, dimmer)" rows={3} {...f('introParagraph2')} />
         </div>
       </div>
-      <Btn onClick={save} style={{ marginTop: '1.5rem' }}>Save About</Btn>
+
+      {/* ── Stats ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Stats Row</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <Input label="Stat 1 — Number (e.g. 10+)" {...f('stat1Num')} />
+          <Input label="Stat 1 — Label (e.g. Projects Built)" {...f('stat1Label')} />
+          <Input label="Stat 2 — Number (e.g. 2+)" {...f('stat2Num')} />
+          <Input label="Stat 2 — Label (e.g. Years Learning)" {...f('stat2Label')} />
+          <Input label="Stat 3 — Number (e.g. ∞)" {...f('stat3Num')} />
+          <Input label="Stat 3 — Label (e.g. Curiosity)" {...f('stat3Label')} />
+        </div>
+      </div>
+
+      {/* ── Profile Card ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Profile Card (right side)</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <Input label="Name" {...f('cardName')} />
+          <Input label="Title" {...f('cardTitle')} />
+          <Input label="Handle (without @)" {...f('cardHandle')} />
+          <Input label="Status" {...f('cardStatus')} />
+          <Input label="Button Text" {...f('cardContactText')} />
+        </div>
+      </div>
+
+      <Btn onClick={save}>Save About</Btn>
     </div>
   );
 }
+
 
 /* ─────────────────────────────────────────────────────────
    Social Links section

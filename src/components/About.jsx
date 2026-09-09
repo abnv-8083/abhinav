@@ -27,6 +27,20 @@ export default function About() {
   const introText2 = aboutData?.introParagraph2 || DEFAULT_INTRO_2;
   const aboutWords = bigText.split(' ');
 
+  const stats = [
+    { num: aboutData?.stat1Num   || '10+', label: aboutData?.stat1Label || 'Projects Built' },
+    { num: aboutData?.stat2Num   || '2+',  label: aboutData?.stat2Label || 'Years Learning' },
+    { num: aboutData?.stat3Num   || '∞',   label: aboutData?.stat3Label || 'Curiosity' },
+  ];
+
+  const card = {
+    name:        aboutData?.cardName        || 'Abhinav',
+    title:       aboutData?.cardTitle       || 'Fullstack Developer',
+    handle:      aboutData?.cardHandle      || 'abnv-8083',
+    status:      aboutData?.cardStatus      || 'Available for work',
+    contactText: aboutData?.cardContactText || 'Hire Me',
+  };
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       const words = bigTextRef.current?.querySelectorAll('.about-word');
@@ -197,11 +211,7 @@ export default function About() {
               flexWrap: 'wrap',
             }}
           >
-            {[
-              { num: '10+', label: 'Projects Built' },
-              { num: '2+', label: 'Years Learning' },
-              { num: '∞', label: 'Curiosity' },
-            ].map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.label}>
                 <p
                   style={{
@@ -226,11 +236,11 @@ export default function About() {
         {/* Right: Profile Card */}
         <div ref={exploringRef} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <ProfileCard
-            name="Abhinav"
-            title="Fullstack Developer"
-            handle="abnv-8083"
-            status="Available for work"
-            contactText="Hire Me"
+            name={card.name}
+            title={card.title}
+            handle={card.handle}
+            status={card.status}
+            contactText={card.contactText}
             avatarUrl="/image-removebg-preview.png"
             iconUrl="/iconpattern.jpg"
             grainUrl="/iconpattern.jpg"
