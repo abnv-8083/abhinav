@@ -231,8 +231,6 @@ export default function About() {
             enableTilt={true}
             enableMobileTilt={false}
             behindGlowEnabled={true}
-            behindGlowColor="rgba(200, 255, 0, 0.25)"
-            innerGradient="linear-gradient(145deg, rgba(200,255,0,0.08) 0%, rgba(8,8,8,0.95) 60%)"
             onContactClick={() => {
               document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
             }}
