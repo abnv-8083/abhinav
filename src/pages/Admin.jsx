@@ -472,6 +472,82 @@ function ExperienceSection() {
 }
 
 /* ─────────────────────────────────────────────────────────
+   Hero section
+───────────────────────────────────────────────────────── */
+function HeroSection() {
+  const [form, setForm] = useState({});
+  const [status, setStatus] = useState({ msg: '', type: '' });
+
+  useEffect(() => {
+    api.hero().then(setForm).catch(() => {});
+  }, []);
+
+  const save = async () => {
+    try {
+      await api.admin.updateHero(form);
+      setStatus({ msg: 'Saved ✓', type: 'ok' });
+    } catch (e) { setStatus({ msg: e.message, type: 'error' }); }
+  };
+
+  const f = (key) => ({ value: form[key] ?? '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
+
+  const groupStyle = { marginBottom: '2rem' };
+  const groupLabel = { fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' };
+
+  return (
+    <div>
+      <SectionTitle>Hero</SectionTitle>
+      <StatusMsg {...status} />
+
+      {/* ── Status badge ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Status Badge</span>
+        <Input {...f('statusBadge')} placeholder="Available for freelance" />
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>The glowing pill badge at the top of the hero.</p>
+      </div>
+
+      {/* ── Name ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Name</span>
+        <Input {...f('name')} placeholder="Abhinav A M" />
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>Displayed with letter-by-letter blur animation.</p>
+      </div>
+
+      {/* ── Headline ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Headline (3 lines)</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <Input label="Line 1 (white)" {...f('headlineLine1')} placeholder="CREATIVE" />
+          <Input label="Line 2 (lime — highlighted)" {...f('headlineLine2')} placeholder="WEB" />
+          <Input label="Line 3 (white)" {...f('headlineLine3')} placeholder="DEVELOPER." />
+        </div>
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>Line 2 is always displayed in lime (#c8ff00).</p>
+      </div>
+
+      {/* ── Subtitle ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Subtitle</span>
+        <Textarea rows={3} {...f('subtitle')} placeholder="I build immersive digital experiences where code, motion and design meet." />
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>Displayed with word-by-word blur animation below the headline.</p>
+      </div>
+
+      {/* ── Meta bar ── */}
+      <div style={groupStyle}>
+        <span style={groupLabel}>Meta Info Bar</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <Input label="Location" {...f('location')} placeholder="Kerala, India" />
+          <Input label="Focus" {...f('focus')} placeholder="Creative Frontend" />
+          <Input label="Status" {...f('status')} placeholder="Open to Work" />
+        </div>
+        <p style={{ fontSize: '0.7rem', color: '#444', marginTop: '0.4rem' }}>Shown at the bottom-left of the hero. Status is displayed in lime.</p>
+      </div>
+
+      <Btn onClick={save}>Save Hero</Btn>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
    About section
 ───────────────────────────────────────────────────────── */
 function AboutSection() {
@@ -617,7 +693,7 @@ function SocialLinksSection() {
 /* ─────────────────────────────────────────────────────────
    Main Admin page
 ───────────────────────────────────────────────────────── */
-const SECTIONS = ['Projects', 'Skills', 'Experience', 'About', 'Social Links'];
+const SECTIONS = ['Projects', 'Skills', 'Experience', 'Hero', 'About', 'Social Links'];
 
 export default function Admin() {
   useAdminCursor(); // restore native cursor — portfolio CSS hides it globally
@@ -725,6 +801,7 @@ export default function Admin() {
           {section === 'Projects'     && <ProjectsSection />}
           {section === 'Skills'       && <SkillsSection />}
           {section === 'Experience'   && <ExperienceSection />}
+          {section === 'Hero'         && <HeroSection />}
           {section === 'About'        && <AboutSection />}
           {section === 'Social Links' && <SocialLinksSection />}
         </main>

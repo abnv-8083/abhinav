@@ -38,6 +38,7 @@ app.use('/api/projects',     require('./routes/projects'));
 app.use('/api/skills',       require('./routes/skills'));
 app.use('/api/journey',      require('./routes/journey'));
 app.use('/api/about',        require('./routes/about'));
+app.use('/api/hero',         require('./routes/hero'));
 app.use('/api/social-links', require('./routes/socialLinks'));
 app.use('/api/upload',       require('./routes/upload'));
 

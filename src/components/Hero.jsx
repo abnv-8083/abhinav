@@ -1,18 +1,36 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowDown } from 'lucide-react';
 import AeroShards from './AeroShards';
 import BlurText from './BlurText';
+import { api } from '../lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const DEFAULTS = {
+  statusBadge:   'Available for freelance',
+  name:          'Abhinav A M',
+  headlineLine1: 'CREATIVE',
+  headlineLine2: 'WEB',
+  headlineLine3: 'DEVELOPER.',
+  subtitle:      'I build immersive digital experiences where code, motion and design meet.',
+  location:      'Kerala, India',
+  focus:         'Creative Frontend',
+  status:        'Open to Work',
+};
+
 export default function Hero() {
-  const sectionRef = useRef(null);
-  const headlineRef = useRef(null);
-  const metaRef = useRef(null);
-  const scrollRef = useRef(null);
-  const shardsWrapRef = useRef(null);
+  const sectionRef     = useRef(null);
+  const headlineRef    = useRef(null);
+  const metaRef        = useRef(null);
+  const scrollRef      = useRef(null);
+  const shardsWrapRef  = useRef(null);
+
+  const [heroData, setHeroData] = useState(null);
+  useEffect(() => { api.hero().then(setHeroData).catch(() => {}); }, []);
+
+  const d = (key) => heroData?.[key] || DEFAULTS[key];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -167,13 +185,13 @@ export default function Hero() {
               textTransform: 'uppercase',
             }}
           >
-            Available for freelance
+          {d('statusBadge')}
           </span>
         </div>
 
         {/* Name — BlurText reveal */}
         <BlurText
-          text="Abhinav A M"
+          text={d('name')}
           animateBy="letters"
           direction="top"
           delay={60}
@@ -194,9 +212,9 @@ export default function Hero() {
             fontSize: 'clamp(3.5rem, 9vw, 9rem)',
             marginBottom: '2rem',
           }}
-          aria-label="Creative Web Developer"
+          aria-label={[d('headlineLine1'), d('headlineLine2'), d('headlineLine3')].join(' ')}
         >
-          {['CREATIVE', 'WEB', 'DEVELOPER.'].map((word, i) => (
+          {[d('headlineLine1'), d('headlineLine2'), d('headlineLine3')].map((word, i) => (
             <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
               <span
                 className="hero-line"
@@ -213,7 +231,7 @@ export default function Hero() {
 
         {/* Sub — BlurText reveal */}
         <BlurText
-          text="I build immersive digital experiences where code, motion and design meet."
+          text={d('subtitle')}
           animateBy="words"
           direction="bottom"
           delay={80}
@@ -235,19 +253,19 @@ export default function Hero() {
             <p style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
               Location
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#eeebe4', fontWeight: 500 }}>Kerala, India</p>
+            <p style={{ fontSize: '0.85rem', color: '#eeebe4', fontWeight: 500 }}>{d('location')}</p>
           </div>
           <div>
             <p style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
               Focus
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#eeebe4', fontWeight: 500 }}>Creative Frontend</p>
+            <p style={{ fontSize: '0.85rem', color: '#eeebe4', fontWeight: 500 }}>{d('focus')}</p>
           </div>
           <div>
             <p style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
               Status
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#c8ff00', fontWeight: 500 }}>Open to Work</p>
+            <p style={{ fontSize: '0.85rem', color: '#c8ff00', fontWeight: 500 }}>{d('status')}</p>
           </div>
         </div>
       </div>

@@ -38,6 +38,7 @@ export const api = {
   experience:  () => apiFetch('/journey/experience'),
   services:    () => apiFetch('/journey/services'),
   about:       () => apiFetch('/about'),
+  hero:        () => apiFetch('/hero'),
   socialLinks: () => apiFetch('/social-links'),
 
   // ── Admin writes ─────────────────────────────────────────
@@ -64,6 +65,9 @@ export const api = {
 
     // About
     updateAbout: (data) => apiFetch('/about', { method: 'PUT', body: JSON.stringify(data), auth: true }),
+
+    // Hero
+    updateHero: (data) => apiFetch('/hero', { method: 'PUT', body: JSON.stringify(data), auth: true }),
 
     // Social links
     createLink: (data) => apiFetch('/social-links', { method: 'POST', body: JSON.stringify(data), auth: true }),
